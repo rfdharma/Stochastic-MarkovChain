@@ -10,7 +10,7 @@ library(tokenizers)
 library(markovchain)
 
 # a single sentence
-short_text <- c("masih produksi kak mie dan beberapa snack seperti chimi ubi brownies crispy cassamo dan sola farm bisa kakak temui di indomaret maupun alfamart terdekat serta beberapa supermarket lainnya semoga membantu ya kak 😊🙏🏻 terima kasih")
+short_text <- c("Pemilu di Indonesia melibatkan banyak partai politik yang bersaing untuk memperoleh dukungan dari pemilih Calon-calon yang akan bertanding berasal dari berbagai partai politik dan independen Para pemilih akan mempertimbangkan berbagai faktor seperti visi politik program rekam jejak dan integritas calon saat memutuskan untuk memberikan suara Penting bagi warga negara Indonesia untuk mengikuti perkembangan politik mendapatkan informasi tentang berbagai calon dan partai politik yang berkompetisi serta memahami isu-isu yang relevan dalam pemilu Mengacu pada sumber berita yang andal mempelajari platform dan program calon serta berpartisipasi dalam diskusi terbuka dengan orang-orang di sekitar")
 
 # split the sentence into words
 text_term <- strsplit(short_text, split = " ") %>% unlist()
@@ -23,35 +23,32 @@ set.seed(123)
 plot(fit_markov$estimate)
 
 
-# Assuming you have the required libraries loaded
+################################################################################
+#Dataset
+
 library(markovchain)
 library(dplyr)
+library(readxl)
 
-# Read the CSV file
 df <- read.csv('result.csv', sep=';')
+df <- read_excel("stokas.xlsx")
 
-# Split the text in the DataFrame into words
-df$text_term <- strsplit(as.character(df$X.full_text), split = " ")
+df$text_term <- strsplit(as.character(df$clean), split = " ")
 
-# Unlist the list of vectors into a single vector
 text_states <- unlist(df$text_term)
 
-# Fit a Markov chain model
 fit_markov <- markovchainFit(text_states, method = "laplace")
 
+set.seed(42)
 
-# Set seed for reproducibility
-set.seed(123)
-
-# Plot the Markov chain model
 plot(fit_markov$estimate)
 
 
-# generate random sentence
+# generate semi-random sentence
 for (i in 1:5) {
   
   set.seed(i)
-  markovchainSequence(n = 6, # generate 7 next words 
+  markovchainSequence(n = 5,
                       markovchain = fit_markov$estimate, # transition matrix
                       t0 = "mie", include.t0 = T) %>%  # set the first word
     
@@ -62,6 +59,7 @@ for (i in 1:5) {
 }
 
 
+# predictive
 predictive_text <- function(text, num_word) {
   library(stringr)
   
@@ -84,3 +82,4 @@ predictive_text <- function(text, num_word) {
 predictive_text("beli mie goreng sama bakso sorean kalau lagi ada duit dan bahan nder", 5)
 predictive_text("mie yang terbaik untuk menyehatkan masyarakat indonesia dengan varian baru", 5)
 predictive_text("mie yang terlihat jelas pedes gledeek ya beli mie rendang ✨",10)
+predictive_text("beli mie rendang sama ayang 😉",10)
